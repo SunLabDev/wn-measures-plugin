@@ -1,0 +1,6 @@
+1.0.1:
+  - First version of SunLab.Measures
+  - create_measures_table.php
+1.0.2:
+  - Add orpheans measures
+  - set_measurable_nullable.php
