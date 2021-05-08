@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
-use October\Rain\Database\Builder;
-use October\Rain\Support\Facades\Str;
+use Winter\Storm\Database\Builder;
+use Winter\Storm\Support\Facades\Str;
 use SunLab\Measures\Behaviors\Measurable;
 use SunLab\Measures\Models\Measure;
 
@@ -23,7 +23,7 @@ abstract class MeasureManager
         }
 
         // Detect if a Builder was passed for bulk incrementation
-        if ($model instanceof Builder && self::isUsingMeasurable($model)) {
+        if ($model instanceof Builder && self::isUsingMeasurable($model->getModel())) {
             $baseBuilder = clone $model;
             $baseBuilder2 = clone $model;
             if (!$baseBuilder->count()) {
@@ -62,6 +62,8 @@ abstract class MeasureManager
             ])
                 ->whereIn('measurable_id', $modelsIDs)
                 ->increment('amount', $amount);
+
+            return true;
         }
 
         throw new \ErrorException('To use MeasureManager::incrementMeasure, you should pass a Measurable model or a Builder querying Measurable model');
@@ -100,9 +102,9 @@ abstract class MeasureManager
         return $model->getMeasure($name);
     }
 
-    public static function amountOf($name, $model)
+    public static function amountOf($name, $model = null)
     {
-
+        return self::getMeasure(...func_get_args())->amount;
     }
 
     public static function __callStatic($name, $parameters)

@@ -1,17 +1,15 @@
 <?php namespace SunLab\Measures\Behaviors;
 
 use Illuminate\Support\Facades\Event;
-use October\Rain\Support\Collection;
-use October\Rain\Support\Facades\Str;
 use SunLab\Measures\Models\Measure;
 
 /**
  * Measurable Extension
  * @package SunLab\Measures\Behaviors
  *
- * @method measures(): October\Rain\Database\Relations\MorphMany
+ * @method measures(): Winter\Storm\Database\Relations\MorphMany
  */
-class Measurable extends \October\Rain\Extension\ExtensionBase
+class Measurable extends \Winter\Storm\Extension\ExtensionBase
 {
     protected $parent;
 
@@ -24,9 +22,9 @@ class Measurable extends \October\Rain\Extension\ExtensionBase
     /** Create if not exists and increment a measure by its name and an amount
      * @param $name
      * @param int $amount
-     * @return mixed
+     * @return int
      */
-    public function incrementMeasure($name, $amount = 1)
+    public function incrementMeasure($name, int $amount = 1): int
     {
         $measure = $this->parent->measures()->firstOrCreate(['name' => $name]);
 
@@ -50,8 +48,8 @@ class Measurable extends \October\Rain\Extension\ExtensionBase
      * @param $name
      * @return int
      */
-    public function amountOf($name): int
+    public function getAmountOf($name): ?int
     {
-        return $this->getMeasure($name)->amount;
+        return $this->getMeasure(...func_get_args())->amount;
     }
 }
