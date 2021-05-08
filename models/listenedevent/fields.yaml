@@ -1,0 +1,60 @@
+fields:
+    active:
+        label: sunlab.measures::lang.watched_events.active
+        type: switch
+        span: left
+
+    _event_type:
+        label: sunlab.measures::lang.watched_events.event_type
+        type: dropdown
+        span: left
+
+    event_name:
+        label: sunlab.measures::lang.watched_events.event_name
+        type: dropdown
+        acceptNewOptions: true
+        span: right
+        dependsOn: _event_type
+
+    model_to_watch:
+        label: sunlab.measures::lang.watched_events.model_to_watch
+        span: right
+        trigger:
+            action: show
+            field: _event_type
+            condition: value[model]
+
+    measure_name:
+        label: sunlab.measures::lang.watched_events.measure_name
+        type: dropdown
+        acceptNewOptions: true
+        span: right
+
+    on_logged_in_user:
+        label: sunlab.measures::lang.watched_events.on_logged_in_user
+        type: switch
+        span: left
+
+    model_to_update:
+        label: sunlab.measures::lang.watched_events.model_to_update
+        span: left
+        trigger:
+            action: show
+            field: on_logged_in_user
+            condition: unchecked
+
+    model_attribute:
+        label: sunlab.measures::lang.watched_events.model_attribute
+        span: right
+        trigger:
+            action: show
+            field: on_logged_in_user
+            condition: unchecked
+
+    route_parameter:
+        label: sunlab.measures::lang.watched_events.route_parameter
+        span: left
+        trigger:
+            action: show
+            field: on_logged_in_user
+            condition: unchecked

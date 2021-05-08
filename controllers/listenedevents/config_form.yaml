@@ -1,0 +1,31 @@
+# ===================================
+#  Form Behavior Config
+# ===================================
+
+# Record name
+name: Listened Event
+
+# Model Form Field configuration
+form: $/sunlab/measures/models/listenedevent/fields.yaml
+
+# Model Class name
+modelClass: SunLab\Measures\Models\ListenedEvent
+
+# Default redirect location
+defaultRedirect: sunlab/measures/listenedevents
+
+# Create page
+create:
+    title: backend::lang.form.create_title
+    redirect: sunlab/measures/listenedevents/update/:id
+    redirectClose: sunlab/measures/listenedevents
+
+# Update page
+update:
+    title: backend::lang.form.update_title
+    redirect: sunlab/measures/listenedevents
+    redirectClose: sunlab/measures/listenedevents
+
+# Preview page
+preview:
+    title: backend::lang.form.preview_title

@@ -1,6 +1,9 @@
 1.0.1:
-  - First version of SunLab.Measures
-  - create_measures_table.php
+    - First version of SunLab.Measures
+    - create_measures_table.php
 1.0.2:
-  - Add orpheans measures
-  - set_measurable_nullable.php
+    - Add orpheans measures
+    - set_measurable_nullable.php
+1.0.3:
+    - Add backend controller
+    - create_listened_events_table.php

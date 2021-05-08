@@ -1,8 +1,8 @@
 <?php namespace SunLab\Measures\Updates;
 
-use October\Rain\Support\Facades\Schema;
-use October\Rain\Database\Schema\Blueprint;
-use October\Rain\Database\Updates\Migration;
+use Winter\Storm\Support\Facades\Schema;
+use Winter\Storm\Database\Schema\Blueprint;
+use Winter\Storm\Database\Updates\Migration;
 
 class SetMeasurableNullable extends Migration
 {
