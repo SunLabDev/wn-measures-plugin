@@ -1,23 +1,23 @@
 fields:
     active:
-        label: sunlab.measures::lang.watched_events.active
+        label: sunlab.measures::lang.listened_events.active
         type: switch
         span: left
 
     _event_type:
-        label: sunlab.measures::lang.watched_events.event_type
+        label: sunlab.measures::lang.listened_events.event_type
         type: dropdown
         span: left
 
     event_name:
-        label: sunlab.measures::lang.watched_events.event_name
+        label: sunlab.measures::lang.listened_events.event_name
         type: dropdown
-        acceptNewOptions: true
+        allowCustom: true
         span: right
         dependsOn: _event_type
 
     model_to_watch:
-        label: sunlab.measures::lang.watched_events.model_to_watch
+        label: sunlab.measures::lang.listened_events.model_to_watch
         span: right
         trigger:
             action: show
@@ -25,35 +25,45 @@ fields:
             condition: value[model]
 
     measure_name:
-        label: sunlab.measures::lang.watched_events.measure_name
+        label: sunlab.measures::lang.listened_events.measure_name
         type: dropdown
-        acceptNewOptions: true
+        allowCustom: true
         span: right
 
     on_logged_in_user:
-        label: sunlab.measures::lang.watched_events.on_logged_in_user
+        label: sunlab.measures::lang.listened_events.on_logged_in_user
+        comment: sunlab.measures::lang.listened_events.on_logged_in_user_desc
         type: switch
         span: left
 
     model_to_update:
-        label: sunlab.measures::lang.watched_events.model_to_update
+        label: sunlab.measures::lang.listened_events.model_to_update
+        comment: sunlab.measures::lang.listened_events.model_to_update_desc
         span: left
-        trigger:
-            action: show
-            field: on_logged_in_user
-            condition: unchecked
-
-    model_attribute:
-        label: sunlab.measures::lang.watched_events.model_attribute
-        span: right
+        placeholder: Winter\Forum\Models\Topic
         trigger:
             action: show
             field: on_logged_in_user
             condition: unchecked
 
     route_parameter:
-        label: sunlab.measures::lang.watched_events.route_parameter
+        label: sunlab.measures::lang.listened_events.route_parameter
+        comment: sunlab.measures::lang.listened_events.route_parameter_desc
         span: left
+        placeholder: slug
+        trigger:
+            action: show
+            field: on_logged_in_user
+            condition: unchecked
+
+    model_attribute:
+        label: sunlab.measures::lang.listened_events.model_attribute
+        comment: sunlab.measures::lang.listened_events.model_attribute_desc
+        span: right
+        preset:
+            field: route_parameter
+            type: exact
+        placeholder: slug
         trigger:
             action: show
             field: on_logged_in_user

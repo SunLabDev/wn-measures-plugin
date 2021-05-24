@@ -1,8 +1,13 @@
-# ===================================
-#  List Column Definitions
-# ===================================
-
 columns:
-    id:
-        label: ID
-        searchable: true
+    model_to_watch:
+        label: sunlab.measures::lang.listened_events.model_to_watch
+
+    event_name:
+        label: sunlab.measures::lang.listened_events.event_name
+
+    measure_name:
+        label: sunlab.measures::lang.listened_events.measure_name
+
+    active:
+        label: sunlab.measures::lang.listened_events.active
+        type: switch
