@@ -30,6 +30,7 @@ For the most basic events, you won't even need to write a line of code.
 This plugin creates a generic event listener which can handle the most basics use cases.
 Example here, it will listen for all the `model.afterCreate` event over the `Winter\Forum\Models\Topic`
 and increment a `topic_created` measure on the logged-in user.
+![image](https://user-images.githubusercontent.com/53976837/119372331-756c4900-bcb7-11eb-81d7-a9e4c5c28f1f.png)
 
 ### Create/Increment a measure
 Once you've added the Measurable Behavior to a model, you can use the model's method `incrementMeasure`.
