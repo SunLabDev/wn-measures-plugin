@@ -13,11 +13,7 @@ class MeasuresTest extends MeasuresPluginTestCase
 {
     public function testIncrementingAMeasureFromAnEvent()
     {
-        User::extend(function ($model) {
-            $model->bindEvent('model.afterUpdate', function () use ($model) {
-                $model->incrementMeasure('user_updated');
-            });
-        });
+        $this->addUpdateEventToUser();
 
         $this->createUser();
 
@@ -25,6 +21,21 @@ class MeasuresTest extends MeasuresPluginTestCase
         $this->user->save();
 
         $this->assertEquals(1, $this->user->getAmountOf('user_updated'));
+    }
+
+    public function testDecrementingAMeasure()
+    {
+        $this->addUpdateEventToUser();
+
+        $this->createUser();
+
+        $this->updateUserEmailThreeTimes();
+
+        $this->assertEquals(3, $this->user->getAmountOf('user_updated'));
+
+        $this->user->decrementMeasure('user_updated');
+
+        $this->assertEquals(2, $this->user->getAmountOf('user_updated'));
     }
 
     public function testIncrementingAMeasureFromAListenedEvent()
@@ -105,5 +116,64 @@ class MeasuresTest extends MeasuresPluginTestCase
         MeasureManager::incrementMeasure('orphan_measure');
 
         $this->assertEquals(1, MeasureManager::amountOf('orphan_measure'));
+    }
+
+    public function testDecrementingOrphanMeasure()
+    {
+        MeasureManager::incrementMeasure('orphan_measure');
+        MeasureManager::incrementMeasure('orphan_measure');
+        MeasureManager::incrementMeasure('orphan_measure');
+
+        MeasureManager::decrementMeasure('orphan_measure');
+
+        $this->assertEquals(2, MeasureManager::amountOf('orphan_measure'));
+    }
+
+    public function testResetMeasures()
+    {
+        $this->addUpdateEventToUser();
+
+        $this->createUser();
+
+        $this->updateUserEmailThreeTimes();
+
+        $this->assertEquals(3, $this->user->getAmountOf('user_updated'));
+
+        $this->user->resetMeasure('user_updated');
+
+        $this->assertEquals(0, $this->user->getAmountOf('user_updated'));
+    }
+
+    public function testResetMeasuresAtPreciseAmount()
+    {
+        $this->addUpdateEventToUser();
+
+        $this->createUser();
+
+        $this->updateUserEmailThreeTimes();
+
+        $this->assertEquals(3, $this->user->getAmountOf('user_updated'));
+
+        $this->user->resetMeasure('user_update', 1);
+
+        $this->assertEquals(1, $this->user->getAmountOf('user_updated'));
+    }
+
+    protected function addUpdateEventToUser()
+    {
+        User::extend(function ($model) {
+            $model->bindEvent('model.afterUpdate', function () use ($model) {
+                $model->incrementMeasure('user_updated');
+            });
+        });
+    }
+
+    protected function updateUserEmailThreeTimes()
+    {
+        // Update the model 3 times
+        for ($i = 1; $i <= 3; $i++) {
+            $this->user->email = "other-email${i}@test.com";
+            $this->user->save();
+        }
     }
 }
