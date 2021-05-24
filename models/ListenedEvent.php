@@ -166,10 +166,15 @@ class ListenedEvent extends Model
 
     public function getMeasureNameOptions()
     {
-        return Measure::query()
+        $measures = Measure::query()
             ->select('name')
             ->distinct('name')
-            ->get()
-            ->pluck('name', 'name');
+            ->get();
+
+        if ($this->measure_name) {
+            $measures->add(['name' => $this->measure_name]);
+        }
+
+        return $measures->pluck('name', 'name');
     }
 }
