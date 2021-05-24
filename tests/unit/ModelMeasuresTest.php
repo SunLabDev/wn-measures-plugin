@@ -1,28 +1,14 @@
-<?php namespace Winter\User\Tests\Unit\Facades;
+<?php namespace SunLab\Measures\Tests\Unit;
 
 use Backend\Facades\BackendAuth;
 use Backend\Models\User;
-use Illuminate\Support\Facades\Route;
 use SunLab\Measures\Classes\MeasureManager;
 use SunLab\Measures\Models\ListenedEvent;
 use SunLab\Measures\Models\Measure;
 use SunLab\Measures\Tests\MeasuresPluginTestCase;
-use Winter\Storm\Support\Facades\Event;
 
-class MeasuresTest extends MeasuresPluginTestCase
+class ModelMeasuresTest extends MeasuresPluginTestCase
 {
-    public function testIncrementingAMeasureFromAnEvent()
-    {
-        $this->addUpdateEventToUser();
-
-        $this->createUser();
-
-        $this->user->email = 'other-email@test.com';
-        $this->user->save();
-
-        $this->assertEquals(1, $this->user->getAmountOf('user_updated'));
-    }
-
     public function testDecrementingAMeasure()
     {
         $this->addUpdateEventToUser();
@@ -53,28 +39,6 @@ class MeasuresTest extends MeasuresPluginTestCase
         $this->user->save();
 
         $this->assertEquals(1, $this->user->getAmountOf('user_updated'));
-    }
-
-    public function testRetrievingModelFromURI()
-    {
-        Route::get('users/{login}', function ($login) {
-            Event::fire('event_name');
-        });
-
-        $listenedEvent = new ListenedEvent;
-        $listenedEvent->event_name = 'event_name';
-        $listenedEvent->measure_name = 'measure_name';
-        $listenedEvent->model_to_update = User::class;
-        $listenedEvent->route_parameter = $listenedEvent->model_attribute = 'login';
-        $listenedEvent->save();
-
-        $this->getPluginObject()->boot();
-
-        $this->createUser();
-
-        $this->get('/users/username');
-
-        $this->assertEquals(1, $this->user->getAmountOf('measure_name'));
     }
 
     public function testBulkIncrementing()
@@ -111,25 +75,7 @@ class MeasuresTest extends MeasuresPluginTestCase
         $this->assertEquals(1, $user3->getAmountOf('measure_name'));
     }
 
-    public function testIncrementingOrphanMeasure()
-    {
-        MeasureManager::incrementMeasure('orphan_measure');
-
-        $this->assertEquals(1, MeasureManager::amountOf('orphan_measure'));
-    }
-
-    public function testDecrementingOrphanMeasure()
-    {
-        MeasureManager::incrementMeasure('orphan_measure');
-        MeasureManager::incrementMeasure('orphan_measure');
-        MeasureManager::incrementMeasure('orphan_measure');
-
-        MeasureManager::decrementMeasure('orphan_measure');
-
-        $this->assertEquals(2, MeasureManager::amountOf('orphan_measure'));
-    }
-
-    public function testResetMeasures()
+    public function testResettingModelMeasures()
     {
         $this->addUpdateEventToUser();
 
@@ -144,7 +90,7 @@ class MeasuresTest extends MeasuresPluginTestCase
         $this->assertEquals(0, $this->user->getAmountOf('user_updated'));
     }
 
-    public function testResetMeasuresAtPreciseAmount()
+    public function testResettingMeasuresAtPreciseAmount()
     {
         $this->addUpdateEventToUser();
 
