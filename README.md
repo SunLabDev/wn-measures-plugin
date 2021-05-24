@@ -25,6 +25,11 @@ class Link extends Model
     //...
 }
 ```
+### _[Experimental feature]_ Plugin's native and generic event listener
+For the most basic events, you won't even need to write a line of code.
+This plugin creates a generic event listener which can handle the most basics use cases.
+Example here, it will listen for all the `model.afterCreate` event over the `Winter\Forum\Models\Topic`
+and increment a `topic_created` measure on the logged-in user.
 
 ### Create/Increment a measure
 Once you've added the Measurable Behavior to a model, you can use the model's method `incrementMeasure`.
