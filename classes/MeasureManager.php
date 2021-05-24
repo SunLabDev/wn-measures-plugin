@@ -11,18 +11,70 @@ abstract class MeasureManager
 {
     public static function incrementMeasure($model, $name = 1, $amount = 1)
     {
+        self::incrementOrDecrementMeasure('increment', $model, $name, $amount);
+    }
+
+    public static function decrementMeasure($model, $name = 1, $amount = 1)
+    {
+        self::incrementOrDecrementMeasure('decrement', $model, $name, $amount);
+    }
+
+    public static function incrementOrphanMeasure($name, $amount = 1): int
+    {
+        $measure = Measure::firstOrCreate([
+            'name' => $name,
+            'measurable_type' => null,
+            'measurable_id' => null,
+        ]);
+
+        Event::fire('sunlab.measures.incrementMeasure', [$measure, null]);
+
+        return $measure->increment('amount', $amount);
+    }
+
+    public static function decrementOrphanMeasure($name, $amount = 1): int
+    {
+        $measure = Measure::firstOrCreate([
+            'name' => $name,
+            'measurable_type' => null,
+            'measurable_id' => null,
+        ]);
+
+        Event::fire('sunlab.measures.decrementMeasure', [$measure, null]);
+
+        return $measure->decrement('amount', $amount);
+    }
+
+    public static function resetOrphanMeasure($name, $amount = 0): int
+    {
+        $measure = Measure::firstOrCreate([
+            'name' => $name,
+            'measurable_type' => null,
+            'measurable_id' => null,
+        ]);
+
+        $measure->amount = $amount;
+        $measure->save();
+
+        Event::fire('sunlab.measures.resetOrphanMeasure', [$measure, null]);
+
+        return $measure->amount;
+    }
+
+    public static function resetMeasure($model, $name = 0, $amount = 0)
+    {
         // Detect if we actually want to increment an orphan measure
         if (is_string($model) && is_int($name)) {
-            return self::incrementOrphanMeasure($model, $name);
+            return self::resetOrphanMeasure($model, $name);
         }
 
         // Detect if we want to increment a model related measure
         if (self::isUsingMeasurable($model)) {
             /* @var Measurable $model */
-            return $model->incrementMeasure($name, $amount);
+            return $model->resetMeasure($name, $amount);
         }
 
-        // Detect if a Builder was passed for bulk incrementation
+        // Detect if a Builder was passed for bulk reset
         if ($model instanceof Builder && self::isUsingMeasurable($model->getModel())) {
             $baseBuilder = clone $model;
             $baseBuilder2 = clone $model;
@@ -41,11 +93,12 @@ abstract class MeasureManager
 
             $now = Carbon::now()->toDateTimeString();
             $newRelations = $modelsWhichDoesntHaveMeasure->map(
-                static function ($relation) use ($name, $now) {
+                static function ($relation) use ($amount, $name, $now) {
                     return [
                         'measurable_type' => $relation->getMorphClass(),
                         'measurable_id' => $relation->getKey(),
                         'name' => $name,
+                        'amount' => $amount,
                         'created_at'=> $now,
                         'updated_at'=> $now
                     ];
@@ -61,25 +114,12 @@ abstract class MeasureManager
                 'measurable_type' => $baseBuilder2->first()->getMorphClass()
             ])
                 ->whereIn('measurable_id', $modelsIDs)
-                ->increment('amount', $amount);
+                ->update(['amount', $amount]);
 
             return true;
         }
 
-        throw new \ErrorException('To use MeasureManager::incrementMeasure, you should pass a Measurable model or a Builder querying Measurable model');
-    }
-
-    public static function incrementOrphanMeasure($name, $amount = 1): int
-    {
-        $measure = Measure::firstOrCreate([
-            'name' => $name,
-            'measurable_type' => null,
-            'measurable_id' => null,
-        ]);
-
-        Event::fire('sunlab.measures.incrementMeasure', [$measure, null]);
-
-        return $measure->increment('amount', $amount);
+        throw new \ErrorException("To use MeasureManager::resetMeasure, you should pass a Measurable model or a Builder querying Measurable model");
     }
 
     public static function getMeasure($name, $model = null)
@@ -136,5 +176,65 @@ abstract class MeasureManager
         return method_exists($model, 'isClassExtendedWith')
                 &&
                $model->isClassExtendedWith(Measurable::class);
+    }
+
+    protected static function incrementOrDecrementMeasure(string $incrementOrDecrement, $model, $name, $amount)
+    {
+        // Detect if we actually want to increment an orphan measure
+        if (is_string($model) && is_int($name)) {
+            return self::{$incrementOrDecrement.'OrphanMeasure'}($model, $name);
+        }
+
+        // Detect if we want to increment a model related measure
+        if (self::isUsingMeasurable($model)) {
+            /* @var Measurable $model */
+            return $model->{$incrementOrDecrement.'Measure'}($name, $amount);
+        }
+
+        // Detect if a Builder was passed for bulk incrementation
+        if ($model instanceof Builder && self::isUsingMeasurable($model->getModel())) {
+            $baseBuilder = clone $model;
+            $baseBuilder2 = clone $model;
+            if (!$baseBuilder->count()) {
+                return;
+            }
+
+            // Find the models which doesn't have the measure yet
+            $modelsWhichDoesntHaveMeasure =
+                $baseBuilder->whereDoesntHave(
+                    'measures',
+                    static function ($q) use ($name) {
+                        return $q->where('name', $name);
+                    }
+                )->get();
+
+            $now = Carbon::now()->toDateTimeString();
+            $newRelations = $modelsWhichDoesntHaveMeasure->map(
+                static function ($relation) use ($name, $now) {
+                    return [
+                        'measurable_type' => $relation->getMorphClass(),
+                        'measurable_id' => $relation->getKey(),
+                        'name' => $name,
+                        'created_at'=> $now,
+                        'updated_at'=> $now
+                    ];
+                }
+            );
+
+            // TODO: Find a way to use Eloquent creation methods instead of insert to fire events
+            Measure::insert($newRelations->toArray());
+
+            $modelsIDs = $baseBuilder2->select('id')->get()->pluck(['id']);
+            Measure::where([
+                'name' => $name,
+                'measurable_type' => $baseBuilder2->first()->getMorphClass()
+            ])
+                ->whereIn('measurable_id', $modelsIDs)
+                ->$incrementOrDecrement('amount', $amount);
+
+            return true;
+        }
+
+        throw new \ErrorException("To use MeasureManager::${incrementOrDecrement}Measure, you should pass a Measurable model or a Builder querying Measurable model");
     }
 }

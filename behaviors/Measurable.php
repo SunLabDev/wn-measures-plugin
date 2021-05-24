@@ -20,17 +20,39 @@ class Measurable extends \Winter\Storm\Extension\ExtensionBase
     }
 
     /** Create if not exists and increment a measure by its name and an amount
-     * @param $name
+     * @param string $name
      * @param int $amount
      * @return int
      */
-    public function incrementMeasure($name, int $amount = 1): int
+    public function incrementMeasure(string $name, int $amount = 1): int
+    {
+        return $this->incrementOrDecrementMeasure('increment', $name, $amount);
+    }
+
+    /** Create if not exists and decrement a measure by its name and an amount
+     * @param string $name
+     * @param int $amount
+     * @return int
+     */
+    public function decrementMeasure(string $name, int $amount = 1): int
+    {
+        return $this->incrementOrDecrementMeasure('decrement', $name, $amount);
+    }
+
+    /**
+     * Reset a measure at a precise amount, default to 0
+     * @param string $name
+     * @param int $amount
+     * @return int
+     */
+    public function resetMeasure(string $name, int $amount = 0): int
     {
         $measure = $this->parent->measures()->firstOrCreate(['name' => $name]);
 
-        $measure->increment('amount', $amount);
+        $measure->amount = $amount;
+        $measure->save();
 
-        Event::fire('sunlab.measures.incrementMeasure', [$this->parent, $measure]);
+        Event::fire("sunlab.measures.resetMeasure", [$this->parent, $measure]);
 
         return $measure->amount;
     }
@@ -51,5 +73,16 @@ class Measurable extends \Winter\Storm\Extension\ExtensionBase
     public function getAmountOf($name): ?int
     {
         return $this->getMeasure(...func_get_args())->amount;
+    }
+
+    protected function incrementOrDecrementMeasure(string $incrementOrDecrement, string $name, int $amount = 1)
+    {
+        $measure = $this->parent->measures()->firstOrCreate(['name' => $name]);
+
+        $measure->$incrementOrDecrement('amount', $amount);
+
+        Event::fire("sunlab.measures.{$incrementOrDecrement}Measure", [$this->parent, $measure]);
+
+        return $measure->amount;
     }
 }
