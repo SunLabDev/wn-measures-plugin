@@ -154,7 +154,7 @@ class MeasuresTest extends MeasuresPluginTestCase
 
         $this->assertEquals(3, $this->user->getAmountOf('user_updated'));
 
-        $this->user->resetMeasure('user_update', 1);
+        $this->user->resetMeasure('user_updated', 1);
 
         $this->assertEquals(1, $this->user->getAmountOf('user_updated'));
     }
