@@ -7,3 +7,5 @@
 1.0.3:
     - Add backend controller
     - create_listened_events_table.php
+1.0.4:
+    - Add incrementing and resetting capabilities
