@@ -1,7 +1,8 @@
 ## Measures
-This plugin allows you to create/increment and display any measures you want on a model, some examples could be:
+This plugin allows you to create, update and display any measures you want on a model, some examples could be:
 - Blog post's views
 - Number of forum topic creation from a member
+- Counting successive daily-connexion of a member
 - API's resource fetches count
 - ...
 
@@ -33,11 +34,6 @@ $post->incrementMeasure('views');
 
 // Optional amount of incrementation can be passed
 $post->incrementMeasure('views', 5);
-
-// Using the MeasureManager statics helper:
-use SunLab\Measures\Classes\MeasureManager;
-MeasureManager::incrementMeasure($post, 'views');
-MeasureManager::incrementMeasure($post, 'views', 5);
 ```
 > Note: You don't have to process any kind of _initialization_ of the measure, just use it.
 
@@ -101,13 +97,25 @@ return new JsonResponse([
 For some reason, you may want to increment some orphan measures:
 ```php
     // Count how many users log-in
-    Event::listen(function() {
+    Event::listen('winter.user.login', function() {
         MeasureManager::incrementOrphanMeasure('users_login');
 
         // incrementMeasure also support orphan measure.
         // Same as:
         MeasureManager::incrementMeasure('users_login');
     });
+```
+
+### Decrement or reset a measure
+The plugin support both decrement and reset on measures, related to model or orphan measure:
+```php
+    // On model implementing Measurable
+    $model->decrementMeasure('post_edit');
+    $model->decrementMeasure('post_edit', 3); // An amount of decrementation can be passed
+
+    // With orphan measures
+    MeasureManager::decrementOrphanMeasure('users_login');
+    MeasureManager::decrementOrphanMeasure('users_login', 3); // An amount of decrementation can be passed
 ```
 
 ### Displaying a measure
@@ -128,9 +136,26 @@ $views = $post->getAmountOf('views');
 {{ post.getAmountOf('view') }}
 ```
 
+### MeasureManager and models
+The `MeasureManager` static class handles orphan and bulk measures modification,
+but can also increment model measure:
+```php
+// Using the MeasureManager static helpers:
+use SunLab\Measures\Classes\MeasureManager;
+    $post = \Winter\Blog\Models\Post::first();
+    // Increment a model's measure
+    MeasureManager::incrementMeasure($post, 'views');
+    MeasureManager::incrementMeasure($post, 'views', 5);
+    // Decrement:
+    MeasureManager::decrementMeasure($model, 'views');
+    MeasureManager::decrementMeasure($model, 'views', 3);
+    // Reset
+    MeasureManager::resetMeasure('views');
+    MeasureManager::resetMeasure('views', 2);
+```
+
 ### TODO-List:
 In a near future, I'll add some feature such as:
-- [ ] Allow decrementing a measure
 - [ ] Bulk incrementation from a model collection instead of the Builder
 - [ ] A ReportWidget displaying some specific measures
 
