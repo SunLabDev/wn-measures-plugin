@@ -30,6 +30,10 @@ class Plugin extends PluginBase
 
     public function boot()
     {
+        if ($this->app->runningInConsole()) {
+            return;
+        }
+        
         $watchedEvents = ListenedEvent::query()
                                      ->where('active', true)
                                      ->get();
