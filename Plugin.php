@@ -30,10 +30,10 @@ class Plugin extends PluginBase
 
     public function boot()
     {
-        if ($this->app->runningInConsole()) {
+        if ($this->app->runningInConsole() && !$this->app->runningUnitTests()) {
             return;
         }
-        
+
         $watchedEvents = ListenedEvent::query()
                                      ->where('active', true)
                                      ->get();
