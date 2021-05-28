@@ -52,7 +52,7 @@ class Measurable extends \Winter\Storm\Extension\ExtensionBase
         $measure->amount = $amount;
         $measure->save();
 
-        Event::fire("sunlab.measures.resetMeasure", [$this->parent, $measure]);
+        Event::fire("sunlab.measures.resetMeasure", [$this->parent, $measure, $amount]);
 
         return $measure->amount;
     }
@@ -81,7 +81,7 @@ class Measurable extends \Winter\Storm\Extension\ExtensionBase
 
         $measure->$incrementOrDecrement('amount', $amount);
 
-        Event::fire("sunlab.measures.{$incrementOrDecrement}Measure", [$this->parent, $measure]);
+        Event::fire("sunlab.measures.{$incrementOrDecrement}Measure", [$this->parent, $measure, $amount]);
 
         return $measure->amount;
     }

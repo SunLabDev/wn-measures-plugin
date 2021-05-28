@@ -37,7 +37,7 @@ abstract class MeasureManager
             'measurable_id' => null,
         ]);
 
-        Event::fire("sunlab.measures.{$incrementOrDecrement}Measure", [null, $measure]);
+        Event::fire("sunlab.measures.{$incrementOrDecrement}Measure", [null, $measure, $amount]);
 
         return $measure->$incrementOrDecrement('amount', $amount);
     }
@@ -53,7 +53,7 @@ abstract class MeasureManager
         $measure->amount = $amount;
         $measure->save();
 
-        Event::fire('sunlab.measures.resetOrphanMeasure', [null, $measure]);
+        Event::fire('sunlab.measures.resetOrphanMeasure', [null, $measure, $amount]);
 
         return $measure->amount;
     }
