@@ -142,6 +142,39 @@ $views = $post->getAmountOf('views');
 {{ post.getAmountOf('view') }}
 ```
 
+### Events
+As said earlier, this plugin gets really powerful and handy to use in other plugins.
+Events are fired on increment, decrement and reset measures.
+All the events contains the model (null for orphan measures), the measure object at its new state, and the amount.
+As an example, you can take a look into [SunLab/Gamification][SunLab/Gamification repository] for a full example:
+```php
+// Plugin.php
+Event::listen('sunlab.measures.incrementMeasure', function ($model, $measure) {
+    // Filter the model we need
+    if (!$model instanceof User) {
+        return;
+    }
+
+    // Process some custom logic depending on the measure name and current amount
+    // In that case, SunLab/Gamification assign "badges" depending on some measures incrementation
+    $correspondingBadges =
+        Badge::where([['measure_name', $measure->name], ['amount_needed', '<=', $measure->amount]])
+            ->whereDoesntHave('users', function ($query) use ($model) {
+                $query->where('user_id', $model->id);
+            })->get();
+
+    if (!blank($correspondingBadges)) {
+        $now = now();
+        $attachedBadges = array_combine(
+            $correspondingBadges->pluck('id')->toArray(),
+            array_fill(0, count($correspondingBadges), ['updated_at' => $now, 'created_at' => $now])
+        );
+
+        $model->badges()->attach($attachedBadges);
+    }
+});
+```
+
 ### MeasureManager and models
 The `MeasureManager` static class handles orphan and bulk measures modification,
 but can also increment model measure:
@@ -166,3 +199,4 @@ In a near future, I'll add some feature such as:
 - [ ] A ReportWidget displaying some specific measures
 
 [Storm extension README]: https://github.com/wintercms/storm/blob/develop/src/Extension/README.md
+[SunLab/Gamification repository]: https://github.com/sunlabdev/wn-gamification-plugin/
