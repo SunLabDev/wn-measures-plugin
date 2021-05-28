@@ -27,7 +27,7 @@ abstract class MeasureManager
             'measurable_id' => null,
         ]);
 
-        Event::fire('sunlab.measures.incrementMeasure', [$measure, null]);
+        Event::fire('sunlab.measures.incrementMeasure', [null, $measure]);
 
         return $measure->increment('amount', $amount);
     }
@@ -40,7 +40,7 @@ abstract class MeasureManager
             'measurable_id' => null,
         ]);
 
-        Event::fire('sunlab.measures.decrementMeasure', [$measure, null]);
+        Event::fire('sunlab.measures.decrementMeasure', [null, $measure]);
 
         return $measure->decrement('amount', $amount);
     }
@@ -56,7 +56,7 @@ abstract class MeasureManager
         $measure->amount = $amount;
         $measure->save();
 
-        Event::fire('sunlab.measures.resetOrphanMeasure', [$measure, null]);
+        Event::fire('sunlab.measures.resetOrphanMeasure', [null, $measure]);
 
         return $measure->amount;
     }
