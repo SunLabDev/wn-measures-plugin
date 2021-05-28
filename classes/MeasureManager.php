@@ -21,18 +21,15 @@ abstract class MeasureManager
 
     public static function incrementOrphanMeasure($name, $amount = 1): int
     {
-        $measure = Measure::firstOrCreate([
-            'name' => $name,
-            'measurable_type' => null,
-            'measurable_id' => null,
-        ]);
-
-        Event::fire('sunlab.measures.incrementMeasure', [null, $measure]);
-
-        return $measure->increment('amount', $amount);
+        return self::incrementOrDecrementOrphanMeasure('increment', $name, $amount);
     }
 
     public static function decrementOrphanMeasure($name, $amount = 1): int
+    {
+        return self::incrementOrDecrementOrphanMeasure('decrement', $name, $amount);
+    }
+
+    protected static function incrementOrDecrementOrphanMeasure(string $incrementOrDecrement, $name, $amount = 1): int
     {
         $measure = Measure::firstOrCreate([
             'name' => $name,
@@ -40,9 +37,9 @@ abstract class MeasureManager
             'measurable_id' => null,
         ]);
 
-        Event::fire('sunlab.measures.decrementMeasure', [null, $measure]);
+        Event::fire("sunlab.measures.{$incrementOrDecrement}Measure", [null, $measure]);
 
-        return $measure->decrement('amount', $amount);
+        return $measure->$incrementOrDecrement('amount', $amount);
     }
 
     public static function resetOrphanMeasure($name, $amount = 0): int
@@ -182,7 +179,7 @@ abstract class MeasureManager
     {
         // Detect if we actually want to increment an orphan measure
         if (is_string($model) && is_int($name)) {
-            return self::{$incrementOrDecrement.'OrphanMeasure'}($model, $name);
+            return self::incrementOrDecrementOrphanMeasure($incrementOrDecrement, $model, $name);
         }
 
         // Detect if we want to increment a model related measure
