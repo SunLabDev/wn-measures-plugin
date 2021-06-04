@@ -125,13 +125,12 @@ class Plugin extends PluginBase
     {
         return [
             'measures' => [
-                'label'       => 'Listened Events',
-                'description' => 'sunlab.measures::lang.settings.description',
+                'label'       => 'sunlab.measures::lang.settings.listened_events.name',
+                'description' => 'sunlab.measures::lang.settings.listened_events.description',
                 'category'    => SettingsManager::CATEGORY_SYSTEM,
                 'icon'        => 'icon-heartbeat',
                 'url'         => Backend::url('sunlab/measures/listenedevents'),
                 'order'       => 500,
-                'keywords'    => 'credentials api key',
                 'permissions' => ['sunlab.measures.access_settings']
             ]
         ];

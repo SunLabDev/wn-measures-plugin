@@ -2,6 +2,12 @@
     'plugin' => [
         'description' => 'Permet de créer de d\'incrémenter toute sorte de mesures sur n\'importe quel modèle.'
     ],
+    'settings' => [
+        'listened_events' => [
+            'name' => "Écouteurs d'évènements",
+            'description' => "Créer des écouteurs d'évènements sans aucune ligne de code",
+        ],
+    ],
     'listened_events' => [
         'active' => 'Actif',
         'event_type' => 'Type d\'événement',

@@ -2,6 +2,12 @@
     'plugin' => [
         'description' => 'Allows to create and increment any measures over any model you want.'
     ],
+    'settings' => [
+        'listened_events' => [
+            'name' => 'Listened events',
+            'description' => 'Create measure events without a piece of code',
+        ],
+    ],
     'listened_events' => [
         'active' => 'Active',
         'event_type' => 'Event type',
