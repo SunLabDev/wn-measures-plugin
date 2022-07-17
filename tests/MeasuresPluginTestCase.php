@@ -2,7 +2,7 @@
 
 use Backend\Facades\BackendAuth;
 use Backend\Models\User;
-use PluginTestCase;
+use System\Tests\Bootstrap\PluginTestCase;
 
 abstract class MeasuresPluginTestCase extends PluginTestCase
 {
