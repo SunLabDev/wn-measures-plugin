@@ -9,3 +9,5 @@
     - create_listened_events_table.php
 1.0.4:
     - Add incrementing and resetting capabilities
+1.0.5:
+    - Fix wrong Str class namespace

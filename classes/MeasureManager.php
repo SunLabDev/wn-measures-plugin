@@ -3,7 +3,7 @@
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Winter\Storm\Database\Builder;
-use Winter\Storm\Support\Facades\Str;
+use Winter\Storm\Support\Str;
 use SunLab\Measures\Behaviors\Measurable;
 use SunLab\Measures\Models\Measure;
 

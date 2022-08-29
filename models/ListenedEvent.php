@@ -2,7 +2,7 @@
 
 use Model;
 use Winter\Storm\Database\Traits\Validation;
-use Winter\Storm\Support\Facades\Str;
+use Winter\Storm\Support\Str;
 
 /**
  * ListenedEvent Model
